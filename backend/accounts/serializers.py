@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 User = get_user_model()
 
+
 class SignupSerailizer(serializers.ModelSerializer):
 	password = serializers.CharField(write_only=True)
 
@@ -15,6 +16,7 @@ class SignupSerailizer(serializers.ModelSerializer):
 	class Meta:
 		model = User
 		fields = ['pk','username', 'password']
+
 
 class SuggestionUserSerializer(serializers.ModelSerializer):
 	class Meta:

@@ -1,129 +1,107 @@
-import React, {useState} from 'react';
-import {Form, Input, Button, notification, Card} from 'antd';
-import {SmileOutlined, FrownOutlined} from "@ant-design/icons";
-import Axios from "axios";
-import {useHistory} from "react-router-dom";
-import {setToken, useAppContext} from "../../store";
-import {useLocation} from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Card, Form, Input, Button, notification } from "antd";
+import { SmileOutlined, FrownOutlined } from "@ant-design/icons";
+import { useHistory, useLocation } from "react-router-dom";
+import { useAppContext } from "store";
+import { setToken } from "store";
+import { parseErrorMessages } from "utils/forms";
+import { axiosInstance } from "api";
 
 export default function Login() {
-    const { dispatch} = useAppContext();
-    const location = useLocation();
-    const history = useHistory();
-    const [fieldErrors, setFieldErrors] = useState({});
+  const { dispatch } = useAppContext();
+  const location = useLocation();
+  const history = useHistory();
+  const [fieldErrors, setFieldErrors] = useState({});
 
-    const {from: loginRedirectUrl} = location.state || {from : {pathname: "/"}};
-    const onFinish =  values => {
+  const { from: loginRedirectUrl } = location.state || {
+    from: { pathname: "/" }
+  };
 
-        async function fn() {
-            const {username, password} = values;
+  const onFinish = values => {
+    async function fn() {
+      const { username, password } = values;
 
-            setFieldErrors({});
+      setFieldErrors({});
 
-            const data = {username, password};
-            try {
-                const response = await Axios.post("http://127.0.0.1:8000/accounts/token/", data);
+      const data = { username, password };
+      try {
+        const response = await axiosInstance.post("/accounts/token/", data);
+        const {
+          data: { token: jwtToken }
+        } = response;
 
-                const {data:{token : jwtToken}} = response;
+        dispatch(setToken(jwtToken));
 
-                dispatch(setToken(jwtToken));
-                // setJwtToken(jwtToken);
+        notification.open({
+          message: "로그인 성공",
+          icon: <SmileOutlined style={{ color: "#108ee9" }} />
+        });
 
-                console.log("jwtToken :", jwtToken);
+        history.push(loginRedirectUrl);
+      } catch (error) {
+        if (error.response) {
+          notification.open({
+            message: "로그인 실패",
+            description: "아이디/암호를 확인해주세요.",
+            icon: <FrownOutlined style={{ color: "#ff3333" }} />
+          });
 
-                notification.open({
-                    message: "로그인 성공",
-                    icon: <SmileOutlined style={{color:"green"}}/>
-                });
-                history.push(loginRedirectUrl);
-            }
-            catch(error) {
-                if (error.response) {
-
-                    notification.open({
-                        message: "로그인 실패",
-                        description: "아이디/암호를 확인해주세요.",
-                        icon: <FrownOutlined style={{color:"#ff3333"}}/>
-                    });
-
-                    const {data: fieldsErrorMessages} = error.response;
-                    setFieldErrors(Object.entries(fieldsErrorMessages).reduce((acc, [fieldName, errors]) => {
-                        errors.join(" ")
-                        acc[fieldName] = {
-                            validateStatus: "error",
-                            help: errors.join(" "),
-                        }
-                        return acc;
-                    }, {}));
-                }
-            }
+          const { data: fieldsErrorMessages } = error.response;
+          // fieldsErrorMessages => { username: "m1 m2", password: [] }
+          // python: mydict.items()
+          setFieldErrors(parseErrorMessages(fieldsErrorMessages));
         }
-        fn();
-    };
-    return (
-        <Card title="login">
-            <Form
-                name="basic"
-                labelCol={{
-                    span: 8,
-                }}
-                wrapperCol={{
-                    span: 16,
-                }}
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-                // onFinishFailed={onFinishFailed}
-                autoComplete="off"
-            >
-                <Form.Item
-                    label="Username"
-                    name="username"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please input your username!',
-                        },
-                        {
-                            min: 5, message: "다섯글자 입력해주세요"
-                        },
-                    ]}
-                    hasFeedback
-                    {...fieldErrors.username}
-                    {...fieldErrors.non_field_errors}
+      }
+    }
+    fn();
+  };
 
-                >
-                    <Input />
-                </Form.Item>
+  return (
+      <Card title="로그인">
+        <Form
+            {...layout}
+            onFinish={onFinish}
+            //   onFinishFailed={onFinishFailed}
+            autoComplete={"false"}
+        >
+          <Form.Item
+              label="Username"
+              name="username"
+              rules={[
+                { required: true, message: "Please input your username!" },
+                { min: 5, message: "다섯 글자 입력해주세요." }
+              ]}
+              hasFeedback
+              {...fieldErrors.username}
+              {...fieldErrors.non_field_errors}
+          >
+            <Input />
+          </Form.Item>
 
-                <Form.Item
-                    label="Password"
-                    name="password"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please input your password!',
-                        },
-                    ]}
-                    hasFeedback={
-                        {...fieldErrors.password}
-                    }
-                >
-                    <Input.Password />
-                </Form.Item>
+          <Form.Item
+              label="Password"
+              name="password"
+              rules={[{ required: true, message: "Please input your password!" }]}
+              {...fieldErrors.password}
+          >
+            <Input.Password />
+          </Form.Item>
 
-                <Form.Item
-                    wrapperCol={{
-                        offset: 8,
-                        span: 16,
-                    }}
-                >
-                    <Button type="primary" htmlType="submit">
-                        Submit
-                    </Button>
-                </Form.Item>
-            </Form>
-        </Card>
-    );
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+  );
 }
+
+const layout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 }
+};
+
+const tailLayout = {
+  wrapperCol: { offset: 8, span: 16 }
+};

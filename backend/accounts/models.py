@@ -22,7 +22,7 @@ class User(AbstractUser):
 		return f"{self.first_name} {self.last_name}".strip()
 
 	@property
-	def avartar_url(self):
+	def avatar_url(self):
 		if self.profile:
 			return self.profile.url
 		else:
