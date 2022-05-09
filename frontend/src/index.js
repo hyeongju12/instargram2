@@ -4,12 +4,7 @@ import 'index.css';
 // import App from 'App';
 import reportWebVitals from 'reportWebVitals';
 import Root from 'pages';
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link, BrowserRouter
-} from "react-router-dom";
+import {BrowserRouter} from "react-router-dom";
 import 'antd/dist/antd.min.css';
 import {AppProvider} from 'store';
 

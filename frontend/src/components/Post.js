@@ -1,6 +1,6 @@
 import React from "react";
 import {Avatar, Card} from "antd";
-import { HeartOutlined, HeartFilled, UserOutlined } from '@ant-design/icons';
+import { HeartOutlined, UserOutlined } from '@ant-design/icons';
 function Post({post}) {
     const {caption, location, photo} = post;
     return (

@@ -15,3 +15,8 @@ class SignupSerailizer(serializers.ModelSerializer):
 	class Meta:
 		model = User
 		fields = ['pk','username', 'password']
+
+class SuggestionUserSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = User
+		fields = ['username', "name", 'avartar_url']

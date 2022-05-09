@@ -4,12 +4,15 @@ import {SmileOutlined, FrownOutlined} from "@ant-design/icons";
 import Axios from "axios";
 import {useHistory} from "react-router-dom";
 import {setToken, useAppContext} from "../../store";
+import {useLocation} from "react-router-dom";
 
 export default function Login() {
     const { dispatch} = useAppContext();
+    const location = useLocation();
     const history = useHistory();
     const [fieldErrors, setFieldErrors] = useState({});
 
+    const {from: loginRedirectUrl} = location.state || {from : {pathname: "/"}};
     const onFinish =  values => {
 
         async function fn() {
@@ -32,13 +35,13 @@ export default function Login() {
                     message: "로그인 성공",
                     icon: <SmileOutlined style={{color:"green"}}/>
                 });
-                // history.push("/accounts/login");
+                history.push(loginRedirectUrl);
             }
             catch(error) {
                 if (error.response) {
 
                     notification.open({
-                        message: "fhrmdls 실패",
+                        message: "로그인 실패",
                         description: "아이디/암호를 확인해주세요.",
                         icon: <FrownOutlined style={{color:"#ff3333"}}/>
                     });
@@ -124,12 +127,3 @@ export default function Login() {
         </Card>
     );
 }
-
-const layout = {
-    labelCol: {span: 8},
-    wrapperCol: {span: 16}
-};
-
-const tailLayout = {
-    wrapperCol: {offset: 8, span: 16}
-};

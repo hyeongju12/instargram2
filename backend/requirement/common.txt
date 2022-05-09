@@ -2,3 +2,4 @@ django~=3.2.13
 pillow
 djangorestframework
 django-cors-headers
+django-pydenticon

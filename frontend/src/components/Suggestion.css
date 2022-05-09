@@ -4,7 +4,8 @@
   align-items: center;
   margin-bottom: 0.5em; }
   .suggestion .avatar {
-    justify-self: center; }
+    justify-self: center;
+    margin-right: 0.5em; }
   .suggestion .action {
     justify-self: right; }
 
