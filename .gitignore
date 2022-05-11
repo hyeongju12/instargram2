@@ -190,3 +190,8 @@ sketch
 # End of https://www.toptal.com/developers/gitignore/api/django,react
 
 .idea/
+.env
+
+common.py
+dev.py
+Dockerfile
